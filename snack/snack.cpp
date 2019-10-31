@@ -45,6 +45,7 @@ Snack g_snack;
 // 食物
 Position g_food;
 
+int g_score;
 
 void InitFood()
 {
@@ -210,7 +211,38 @@ void EatFood()
 		g_snack.pos[g_snack.size - 1].y = g_food.y;
 
 		InitFood();
+
+		g_score += 10;
 	}
+}
+
+// 撞墙返回-1，正常返回0
+int HitWall()
+{
+	if (g_snack.pos[0].x < 0 ||
+		g_snack.pos[0].y < 0 ||
+		g_snack.pos[0].x > MAP_WIDTH ||
+		g_snack.pos[0].y > MAP_HEIGHT)
+	{
+		return -1;
+	}
+
+	return 0;
+}
+
+// 头节点跟其他节点是否坐标相同
+// 吃到自己返回-1，正常返回0
+int EatSelf()
+{
+	for (i = 1; i < g_snack.size; i++)
+	{
+		if (g_snack.pos[0].x == g_snack.pos[i].x &&
+			g_snack.pos[0].y == g_snack.pos[i].y)
+		{
+			return -1;
+		}
+	}
+	return 0;
 }
 
 void GameLoop()
@@ -239,6 +271,12 @@ void GameLoop()
 		// 处理撞墙等事件
 		EatFood();
 
+		if (HitWall() < 0)
+		{
+			return;
+		}
+
+
 		// 更新画面
 		UpdateScreen();
 
@@ -249,6 +287,9 @@ void GameLoop()
 
 void Score()
 {
+	system("cls");
+	printf("Good Game!\n");
+	printf("得分 %d\n", g_score);
 }
 
 int main(int argc, char* argv[])
