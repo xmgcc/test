@@ -146,6 +146,73 @@ void UpdateScreen()
 	DrawSnack();
 }
 
+// w 上
+// s 下
+// a 左
+// d 右
+void SnackMove(int key)
+{
+	int delta_x = 0;
+	int delta_y = 0;
+
+	
+	if (key == 'w' || key == 'W')// w 上
+	{
+		delta_x = 0;
+		delta_y = -1;
+	}
+	else if (key == 's' || key == 'S')// s 下
+	{
+		delta_x = 0;
+		delta_y = 1;
+	}
+	else if (key == 'a' || key == 'A')// a 左
+	{
+		delta_x = -1;
+		delta_y = 0;
+	}
+	else if (key == 'd' || key == 'D')// d 右
+	{
+		delta_x = 1;
+		delta_y = 0;
+	}
+	else
+	{
+		// 无效按键
+		return;
+	}
+
+	// 删掉尾节点
+	DrawChar(g_snack.pos[g_snack.size - 1].x, g_snack.pos[g_snack.size - 1].y, ' ');
+
+	// 后一个节点　＝　前一个节点的坐标
+	// g_snack.size - 1 :最后一个节点的坐标
+	// i>0 不包括头节点
+	for (int i = g_snack.size - 1; i > 0; i--)
+	{
+		g_snack.pos[i].x = g_snack.pos[i-1].x;
+		g_snack.pos[i].y = g_snack.pos[i-1].y;
+	}
+	
+	g_snack.pos[0].x += delta_x;
+	g_snack.pos[0].y += delta_y;
+}
+
+// 头节点跟食物的坐标相同
+void EatFood()
+{
+	if (g_snack.pos[0].x == g_food.x &&
+		g_snack.pos[0].y == g_food.y)
+	{
+		g_snack.size++;
+		// 新的尾节点跟食物的坐标一致
+		g_snack.pos[g_snack.size - 1].x = g_food.x;
+		g_snack.pos[g_snack.size - 1].y = g_food.y;
+
+		InitFood();
+	}
+}
+
 void GameLoop()
 {
 	int key = 0;
@@ -166,7 +233,11 @@ void GameLoop()
 			return;
 		}
 
+		// 键盘移动贪吃蛇
+		SnackMove(key);
+
 		// 处理撞墙等事件
+		EatFood();
 
 		// 更新画面
 		UpdateScreen();
